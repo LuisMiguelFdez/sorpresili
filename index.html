@@ -109,6 +109,23 @@
       color: #6c757d;
       font-size: 1.15rem;
     }
+    .broma-msg {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+    .btn-final {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #dc3545;
+      border: none;
+      background: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .btn-final:hover {
+      color: #bd2130;
+    }
   </style>
 </head>
 <body>
@@ -184,21 +201,46 @@
           </h2>
           <div id="${id}" class="accordion-collapse collapse">
             <div class="accordion-body" id="${id}-body">
-              ${desbloqueada ? pista.contenido : `<span class="locked" id="lock${i}">🔐 Disponible el ${pista.fecha}</span><button class="unlock-btn" onclick="desbloquear('${id}-body', 'lock${i}', ${i})">Soy una ansias 😅</button>`}
+              ${desbloqueada
+                ? pista.contenido
+                : `
+                  <span class="locked" id="lock${i}">🔐 Disponible el ${pista.fecha}</span>
+                  <button class="unlock-btn" onclick="mostrarBroma('${id}-body', 'lock${i}', ${i})">Soy una ansias 😅</button>
+                `}
             </div>
           </div>
         </div>`;
     });
 
-    function desbloquear(bodyId, lockId, index) {
+    function mostrarBroma(bodyId, lockId, index) {
       const body = document.getElementById(bodyId);
       const lock = document.getElementById(lockId);
       if (lock) lock.remove();
       const btn = body.querySelector('.unlock-btn');
       if (btn) btn.remove();
-      body.innerHTML = pistas[index].contenido;
-      desbloqueadas++;
-      checkReveal();
+
+      const mensaje = document.createElement('div');
+      mensaje.classList.add('broma-msg');
+      let contador = 7;
+      mensaje.innerHTML = `Esta vez no va a funcionar así 🤨... `;
+      body.appendChild(mensaje);
+
+      const intervalo = setInterval(() => {
+        contador--;
+        mensaje.innerHTML = `Esta vez no va a funcionar así 🤨... `;
+        if (contador <= 0) {
+          clearInterval(intervalo);
+          const botonFinal = document.createElement('button');
+          botonFinal.classList.add('btn-final');
+          botonFinal.innerText = 'Bueno, anda puedes abrirla';
+          botonFinal.onclick = () => {
+            body.innerHTML = pistas[index].contenido;
+            desbloqueadas++;
+            checkReveal();
+          };
+          body.appendChild(botonFinal);
+        }
+      }, 1000);
     }
 
     function checkReveal() {
